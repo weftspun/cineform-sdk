@@ -1088,7 +1088,7 @@ void SetEncoderFormatRecursive(ENCODER *encoder, int width, int height, int disp
 	if (encoder->frame == NULL)
 	{
 #if (DEBUG && _WIN32)
-		OutputDebugString("sizeof(FRAME)");
+		OutputDebugStringA("sizeof(FRAME)");
 #endif
 		return;
 	}
@@ -2150,7 +2150,7 @@ bool EncodeSample(ENCODER *encoder, uint8_t *data, int width, int height, int pi
 			{
 				encoder->reported_license_issue = 1;
 
-				MessageBox(GetFocus(), "You are attempting to encode a format for which this system is not licensed. Please contact support@CineForm.com.", "Licensing Error", MB_OK|MB_SYSTEMMODAL);
+				MessageBoxA(GetFocus(), "You are attempting to encode a format for which this system is not licensed. Please contact support@CineForm.com.", "Licensing Error", MB_OK|MB_SYSTEMMODAL);
 			}
 	#endif
 			return false;
@@ -2172,7 +2172,7 @@ bool EncodeSample(ENCODER *encoder, uint8_t *data, int width, int height, int pi
 			{
 				encoder->reported_license_issue = 1;
 
-				MessageBox(GetFocus(), "You are attempting to encode a format for which this system is not licensed. Please contact support@CineForm.com.", "Licensing Error", MB_OK|MB_SYSTEMMODAL);
+				MessageBoxA(GetFocus(), "You are attempting to encode a format for which this system is not licensed. Please contact support@CineForm.com.", "Licensing Error", MB_OK|MB_SYSTEMMODAL);
 			}
 	#endif
 			return false;
@@ -2202,7 +2202,7 @@ bool EncodeSample(ENCODER *encoder, uint8_t *data, int width, int height, int pi
 			{
 				encoder->reported_license_issue = 1;
 
-				MessageBox(GetFocus(), "You are attempting to encode an image size for which this system is not licensed. Please contact support@CineForm.com.", "Licensing Error", MB_OK|MB_SYSTEMMODAL);
+				MessageBoxA(GetFocus(), "You are attempting to encode an image size for which this system is not licensed. Please contact support@CineForm.com.", "Licensing Error", MB_OK|MB_SYSTEMMODAL);
 			}
 	#endif
 			return false;
@@ -2223,7 +2223,7 @@ bool EncodeSample(ENCODER *encoder, uint8_t *data, int width, int height, int pi
 			{
 				encoder->reported_license_issue = 1;
 
-				MessageBox(GetFocus(), "You are attempting to encode a stereo/3D format for which this system is not licensed. Please contact support@CineForm.com.", "Licensing Error", MB_OK|MB_SYSTEMMODAL);
+				MessageBoxA(GetFocus(), "You are attempting to encode a stereo/3D format for which this system is not licensed. Please contact support@CineForm.com.", "Licensing Error", MB_OK|MB_SYSTEMMODAL);
 			}
 	#endif
 			return false;
@@ -2858,7 +2858,7 @@ bool EncodeSample(ENCODER *encoder, uint8_t *data, int width, int height, int pi
 		if(encoder->reported_error == 0)
 		{
 			encoder->reported_error = 1;
-			MessageBox(GetFocus(), "CODEC_ERROR_INVALID_FORMAT. Please contact support@CineForm.com.", "Licensing Error", MB_OK|MB_SYSTEMMODAL);
+			MessageBoxA(GetFocus(), "CODEC_ERROR_INVALID_FORMAT. Please contact support@CineForm.com.", "Licensing Error", MB_OK|MB_SYSTEMMODAL);
 		}
 #endif
 		return false;
@@ -7863,7 +7863,7 @@ void EncodeQuantizedGroup(ENCODER *encoder, TRANSFORM *transform[], int num_tran
 	else if(encoder->uncompressed == 3)
 	{
 #if (DEBUG && _WIN32)
-		OutputDebugString("pop 2");
+		OutputDebugStringA("pop 2");
 #endif
 		//	Set Sample size field here.
 		SizeTagPop(output);
@@ -7875,7 +7875,7 @@ void EncodeQuantizedGroup(ENCODER *encoder, TRANSFORM *transform[], int num_tran
 	else
 	{
 #if (DEBUG && _WIN32)
-		OutputDebugString("pop 3");
+		OutputDebugStringA("pop 3");
 #endif
 		//	Set Sample size field here.
 		SizeTagPop(output);

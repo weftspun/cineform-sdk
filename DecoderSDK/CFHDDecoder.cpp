@@ -497,7 +497,7 @@ CFHD_ParseSampleHeader(void *samplePtr,
 #if _WIN32
 		char message[256];
 		sprintf_s(message, sizeof(message), "CSampleDecoder::PrepareDecoder caught internal codec error\n");
-		OutputDebugString(message);
+		OutputDebugStringA(message);
 #endif
 		return CFHD_ERROR_INTERNAL;
 	}
@@ -749,7 +749,7 @@ CFHD_DecodeSample(CFHD_DecoderRef decoderRef,
 	catch (...)
 	{
 #ifdef _WIN32
-		OutputDebugString("Target memory buffer is an invalid size");
+		OutputDebugString(TEXT("Target memory buffer is an invalid size"));
 #endif
 		return CFHD_ERROR_DECODE_BUFFER_SIZE;
 	}

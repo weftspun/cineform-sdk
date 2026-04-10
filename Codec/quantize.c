@@ -314,7 +314,7 @@ void QuantizationSetQuality(QUANTIZER *q,
 					char t[100];
 					sprintf_s(t, sizeof(t), "compression = %f, FSratelimiter = %d (q%d)",
 						compression, q->FSratelimiter, q->newQuality);
-					OutputDebugString(t);
+					OutputDebugStringA(t);
 				}
 #endif
 			}

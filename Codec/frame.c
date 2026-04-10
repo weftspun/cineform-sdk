@@ -161,7 +161,7 @@ FRAME *CreateFrame(int width, int height, int display_height, int format)
 	if (frame == NULL)
 	{
 #if (DEBUG && _WIN32)
-		OutputDebugString("sizeof(FRAME)");
+		OutputDebugStringA("sizeof(FRAME)");
 #endif
 		return NULL;
 	}

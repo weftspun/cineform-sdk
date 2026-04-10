@@ -22,6 +22,7 @@
 #include <time.h>
 
 #ifdef _WIN32
+#include <objbase.h>
 #else
 #include <uuid/uuid.h>
 #ifdef __APPLE__
@@ -348,7 +349,7 @@ CSampleEncoder::PrepareToEncode(int inputWidth,
 			if(err != CFHD_ERROR_OKAY)
 			{
 #if _WIN32
-				OutputDebugString("First AllocateSampleBuffer Failed Again\n");
+				OutputDebugStringA("First AllocateSampleBuffer Failed Again\n");
 #endif
 				return err;
 			}
@@ -511,7 +512,7 @@ CSampleEncoder::EncodeSample(void *frameBuffer,
 		if(err != CFHD_ERROR_OKAY)
 		{
 #if _WIN32
-			OutputDebugString("AllocateSampleBuffer Failed\n");
+			OutputDebugStringA("AllocateSampleBuffer Failed\n");
 #endif
 			// Assume compression produces 3:1 or more.
 			if(m_encodingFlags & CFHD_ENCODING_FLAGS_LARGER_OUTPUT)
@@ -524,7 +525,7 @@ CSampleEncoder::EncodeSample(void *frameBuffer,
 			if(err != CFHD_ERROR_OKAY)
 			{
 #if _WIN32
-				OutputDebugString("AllocateSampleBuffer Failed Again\n");
+				OutputDebugStringA("AllocateSampleBuffer Failed Again\n");
 #endif
 				return err;
 			}
@@ -576,7 +577,7 @@ CSampleEncoder::EncodeSample(void *frameBuffer,
 	catch (...)
 	{
 #if _WIN32
-		OutputDebugString("::EncodeSample: Unexpected error");
+		OutputDebugStringA("::EncodeSample: Unexpected error");
 #endif
 		return CFHD_ERROR_UNEXPECTED;
 	}

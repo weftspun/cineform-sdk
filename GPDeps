@@ -1,8 +1,0 @@
-{
-  "version": "1.0",
-  "info": {
-    "type": "lib",
-    "visibility": "public",
-    "platforms": ["macos", "win", "linux"]
-  }
-}

@@ -44,13 +44,13 @@
 #ifdef _WIN32
 
 // Define the locations of registry keys for color processing
-#define REG_COLORPROCESSING_PATH _T("SOFTWARE\\CineForm\\ColorProcessing") // HKCU Where default props are stored
-#define REG_COLORPROCESSING_PREMIERE_KEY _T("Premiere") // The default Decoder resolution key
-#define REG_COLORPROCESSING_DEFAULT_KEY _T("Default") // The default Decoder resolution key
-#define REG_COLORPROCESSING_CS_OVERRIDE_KEY _T("ColorSpaceOverride")  //Use to tell the decode that the source was not what it think it is.
-#define REG_COLORPROCESSING_LAST_GUID_KEY _T("LastGUID")  // Last GUID played
-#define REG_COLORPROCESSING_FRAME_COUNT_KEY _T("LastFrameCount")  // Last frame count played
-#define REG_COLORPROCESSING_LAST_TIMECODE_KEY _T("LastTimecode")  // Last timecode played
+#define REG_COLORPROCESSING_PATH TEXT("SOFTWARE\\CineForm\\ColorProcessing") // HKCU Where default props are stored
+#define REG_COLORPROCESSING_PREMIERE_KEY TEXT("Premiere") // The default Decoder resolution key
+#define REG_COLORPROCESSING_DEFAULT_KEY TEXT("Default") // The default Decoder resolution key
+#define REG_COLORPROCESSING_CS_OVERRIDE_KEY TEXT("ColorSpaceOverride")  //Use to tell the decode that the source was not what it think it is.
+#define REG_COLORPROCESSING_LAST_GUID_KEY TEXT("LastGUID")  // Last GUID played
+#define REG_COLORPROCESSING_FRAME_COUNT_KEY TEXT("LastFrameCount")  // Last frame count played
+#define REG_COLORPROCESSING_LAST_TIMECODE_KEY TEXT("LastTimecode")  // Last timecode played
 
 
 //TODO: Remove this routine as it does not appear to be used anywhere
@@ -477,56 +477,70 @@ void InitLUTPaths(DECODER *decoder)
 #ifdef _WIN32
 		DWORD dwType = REG_SZ, length = 260;
 		HKEY hKey = 0;
-		const char* CPsubkey = "SOFTWARE\\CineForm\\ColorProcessing";
+		const TCHAR* CPsubkey = TEXT("SOFTWARE\\CineForm\\ColorProcessing");
 
-		char defaultLUTpath[260] = "NONE";
-		char defaultOverridePath[260] = "";
-		char DbNameStr[64] = "db";
+		const size_t max_path_len = 260;
+		const size_t max_name_len = 64;
+		TCHAR defaultLUTpath[max_path_len] = TEXT("NONE");
+		TCHAR defaultOverridePath[max_path_len] = TEXT("");
+		TCHAR DbNameStr[max_name_len] = TEXT("db");
 
 		RegOpenKey(HKEY_CURRENT_USER, CPsubkey, &hKey);
 		if (hKey != 0)
 		{
-			length = 260;
-			RegQueryValueEx(hKey, "LUTPath", NULL, &dwType, (LPBYTE)defaultLUTpath, &length);
-			length = 260;
-			RegQueryValueEx(hKey, "OverridePath", NULL, &dwType, (LPBYTE)defaultOverridePath, &length);
-			length = 64;
-			RegQueryValueEx(hKey, "DBPath", NULL, &dwType, (LPBYTE)DbNameStr, &length);
+			length = max_path_len;
+			RegQueryValueEx(hKey, TEXT("LUTPath"), NULL, &dwType, (LPBYTE)defaultLUTpath, &length);
+			length = max_path_len;
+			RegQueryValueEx(hKey, TEXT("OverridePath"), NULL, &dwType, (LPBYTE)defaultOverridePath, &length);
+			length = max_name_len;
+			RegQueryValueEx(hKey, TEXT("DBPath"), NULL, &dwType, (LPBYTE)DbNameStr, &length);
 		}
 
-		if (0 == strcmp(defaultLUTpath, "NONE"))
+		if (0 == wcscmp(defaultLUTpath, TEXT("NONE")))
 		{
 			int n;
-			char PublicPath[80];
+			TCHAR PublicPath[80];
 
-			if (n = GetEnvironmentVariable("PUBLIC", PublicPath, 79)) // Vista and Win7
+			if (n = GetEnvironmentVariable(TEXT("PUBLIC"), PublicPath, 79)) // Vista and Win7
 			{
-				_stprintf_s(defaultLUTpath, sizeof(defaultLUTpath), _T("%s\\%s"), PublicPath, _T("CineForm\\LUTs")); //Vista & 7 default
-				_stprintf_s(defaultOverridePath, sizeof(defaultOverridePath), _T("%s\\%s"), PublicPath, _T("CineForm\\LUTs")); //Vista & 7 default
+				_stprintf_s(defaultLUTpath, max_path_len, TEXT("%s\\%s"), PublicPath, TEXT("CineForm\\LUTs")); //Vista & 7 default
+				_stprintf_s(defaultOverridePath, max_path_len, TEXT("%s\\%s"), PublicPath, TEXT("CineForm\\LUTs")); //Vista & 7 default
 			}
 			else
 			{
-				const char* CVsubkey = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion";
+				const TCHAR* CVsubkey = TEXT("SOFTWARE\\Microsoft\\Windows\\CurrentVersion");
 				RegOpenKey(HKEY_LOCAL_MACHINE, CVsubkey, &hKey);
 				if (hKey != 0)
 				{
-					char commonpath[64] = "NONE";
+					TCHAR commonpath[64] = TEXT("NONE");
 					length = 64;
-					RegQueryValueEx(hKey, "CommonFilesDir (x86)", NULL, &dwType, (LPBYTE)commonpath, &length);
-					if (0 == strcmp(commonpath, "NONE"))
+					RegQueryValueEx(hKey, TEXT("CommonFilesDir (x86)"), NULL, &dwType, (LPBYTE)commonpath, &length);
+					if (0 == wcscmp(commonpath, TEXT("NONE")))
 					{
 						length = 64;
-						RegQueryValueEx(hKey, "CommonFilesDir", NULL, &dwType, (LPBYTE)commonpath, &length);
+						RegQueryValueEx(hKey, TEXT("CommonFilesDir"), NULL, &dwType, (LPBYTE)commonpath, &length);
 					}
-					_stprintf_s(defaultLUTpath, sizeof(defaultLUTpath), _T("%s\\%s"), commonpath, _T("CineForm\\LUTs"));
-					_stprintf_s(defaultOverridePath, sizeof(defaultOverridePath), _T("%s\\%s"), commonpath, _T("CineForm\\LUTs"));
+					_stprintf_s(defaultLUTpath, max_path_len, TEXT("%s\\%s"), commonpath, TEXT("CineForm\\LUTs"));
+					_stprintf_s(defaultOverridePath, max_path_len, TEXT("%s\\%s"), commonpath, TEXT("CineForm\\LUTs"));
 				}
 			}
 		}
 
+		// I found that the old code was not actually unicode safe, despite the attempt to be.
+		// I don't want to change the encoder and decoder structures at this time,
+		// so I am converting the strings back to multibyte before copying them into the structures.
+		// This is not ideal, but it is better than the previous code which could potentially write
+		// past the end of the buffers if the registry values were too long.
+#if defined(UNICODE) || defined(_UNICODE)
+		size_t result_length = 0;
+		wcstombs_s(&result_length, decoder->OverridePathStr, sizeof(decoder->OverridePathStr), defaultOverridePath, _TRUNCATE);
+		wcstombs_s(&result_length, decoder->LUTsPathStr, sizeof(decoder->LUTsPathStr), defaultLUTpath, _TRUNCATE);
+		wcstombs_s(&result_length, decoder->UserDBPathStr, sizeof(decoder->UserDBPathStr), DbNameStr, _TRUNCATE);
+#else
 		strncpy_s(decoder->OverridePathStr, sizeof(decoder->OverridePathStr), defaultOverridePath, sizeof(decoder->OverridePathStr));
 		strncpy_s(decoder->LUTsPathStr, sizeof(decoder->LUTsPathStr), defaultLUTpath, sizeof(decoder->LUTsPathStr));
 		strncpy_s(decoder->UserDBPathStr, sizeof(decoder->UserDBPathStr), DbNameStr, sizeof(decoder->UserDBPathStr));
+#endif
 
 #elif __APPLE_REMOVE__
 		CFPropertyListRef	appValue;
@@ -626,57 +640,71 @@ void InitLUTPathsEnc(ENCODER *encoder)
 	{
 		DWORD dwType = REG_SZ, length = 260;
 		HKEY hKey = 0;
-		const char* CPsubkey = "SOFTWARE\\CineForm\\ColorProcessing";
+		const TCHAR* CPsubkey = TEXT("SOFTWARE\\CineForm\\ColorProcessing");
 
-		char defaultLUTpath[260] = "NONE";
-		char defaultOverridePath[260] = "";
-		char DbNameStr[64] = "db";
+		const size_t max_path_len = 260;
+		const size_t max_name_len = 64;
+		TCHAR defaultLUTpath[max_path_len] = TEXT("NONE");
+		TCHAR defaultOverridePath[max_path_len] = TEXT("");
+		TCHAR DbNameStr[max_name_len] = TEXT("db");
 
 		RegOpenKey(HKEY_CURRENT_USER, CPsubkey, &hKey);
 		if (hKey != 0)
 		{
-			length = 260;
-			RegQueryValueEx(hKey, "LUTPath", NULL, &dwType, (LPBYTE)defaultLUTpath, &length);
-			length = 260;
-			RegQueryValueEx(hKey, "OverridePath", NULL, &dwType, (LPBYTE)defaultOverridePath, &length);
-			length = 64;
-			RegQueryValueEx(hKey, "DBPath", NULL, &dwType, (LPBYTE)DbNameStr, &length);
+			length = max_path_len;
+			RegQueryValueEx(hKey, TEXT("LUTPath"), NULL, &dwType, (LPBYTE)defaultLUTpath, &length);
+			length = max_path_len;
+			RegQueryValueEx(hKey, TEXT("OverridePath"), NULL, &dwType, (LPBYTE)defaultOverridePath, &length);
+			length = max_name_len;
+			RegQueryValueEx(hKey, TEXT("DBPath"), NULL, &dwType, (LPBYTE)DbNameStr, &length);
 		}
 
-		if (0 == strcmp(defaultLUTpath, "NONE"))
+		if (0 == wcscmp(defaultLUTpath, TEXT("NONE")))
 		{
 			int n;
-			char PublicPath[80];
+			TCHAR PublicPath[80];
 
-			if (n = GetEnvironmentVariable("PUBLIC", PublicPath, 79)) // Vista and Win7
+			if (n = GetEnvironmentVariable(TEXT("PUBLIC"), PublicPath, 79)) // Vista and Win7
 			{
-				_stprintf_s(defaultLUTpath, sizeof(defaultLUTpath), _T("%s\\%s"), PublicPath, _T("CineForm\\LUTs")); //Vista & 7 default
-				_stprintf_s(defaultOverridePath, sizeof(defaultOverridePath), _T("%s\\%s"), PublicPath, _T("CineForm\\LUTs")); //Vista & 7 default
+				_stprintf_s(defaultLUTpath, max_path_len, TEXT("%s\\%s"), PublicPath, TEXT("CineForm\\LUTs")); //Vista & 7 default
+				_stprintf_s(defaultOverridePath, max_path_len, TEXT("%s\\%s"), PublicPath, TEXT("CineForm\\LUTs")); //Vista & 7 default
 			}
 			else
 			{
-				const char* CVsubkey = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion";
+				const TCHAR* CVsubkey = TEXT("SOFTWARE\\Microsoft\\Windows\\CurrentVersion");
 				RegOpenKey(HKEY_LOCAL_MACHINE, CVsubkey, &hKey);
 				if (hKey != 0)
 				{
-					char commonpath[64] = "NONE";
+					TCHAR commonpath[64] = TEXT("NONE");
 					length = 64;
-					RegQueryValueEx(hKey, "CommonFilesDir (x86)", NULL, &dwType, (LPBYTE)commonpath, &length);
-					if (0 == strcmp(commonpath, "NONE"))
+					RegQueryValueEx(hKey, TEXT("CommonFilesDir (x86)"), NULL, &dwType, (LPBYTE)commonpath, &length);
+					if (0 == wcscmp(commonpath, TEXT("NONE")))
 					{
 						length = 64;
-						RegQueryValueEx(hKey, "CommonFilesDir", NULL, &dwType, (LPBYTE)commonpath, &length);
+						RegQueryValueEx(hKey, TEXT("CommonFilesDir"), NULL, &dwType, (LPBYTE)commonpath, &length);
 					}
-					_stprintf_s(defaultLUTpath, sizeof(defaultLUTpath), _T("%s\\%s"), commonpath, _T("CineForm\\LUTs"));
-					_stprintf_s(defaultOverridePath, sizeof(defaultOverridePath), _T("%s\\%s"), commonpath, _T("CineForm\\LUTs"));
+					_stprintf_s(defaultLUTpath, max_path_len, TEXT("%s\\%s"), commonpath, TEXT("CineForm\\LUTs"));
+					_stprintf_s(defaultOverridePath, max_path_len, TEXT("%s\\%s"), commonpath, TEXT("CineForm\\LUTs"));
 				}
 			}
 		}
 
+		// I found that the old code was not actually unicode safe, despite the attempt to be.
+		// I don't want to change the encoder and decoder structures at this time,
+		// so I am converting the strings back to multibyte before copying them into the structures.
+		// This is not ideal, but it is better than the previous code which could potentially write
+		// past the end of the buffers if the registry values were too long.
+#if defined(UNICODE) || defined(_UNICODE)
+		size_t result_length = 0;
+		wcstombs_s(&result_length, encoder->OverridePathStr, sizeof(encoder->OverridePathStr), defaultOverridePath, _TRUNCATE);
+		wcstombs_s(&result_length, encoder->LUTsPathStr, sizeof(encoder->LUTsPathStr), defaultLUTpath, _TRUNCATE);
+		wcstombs_s(&result_length, encoder->UserDBPathStr, sizeof(encoder->UserDBPathStr), DbNameStr, _TRUNCATE);
+#else
 		strncpy_s(encoder->OverridePathStr, sizeof(encoder->OverridePathStr), defaultOverridePath, sizeof(encoder->OverridePathStr));
 		strncpy_s(encoder->LUTsPathStr, sizeof(encoder->LUTsPathStr), defaultLUTpath, sizeof(encoder->LUTsPathStr));
 		strncpy_s(encoder->UserDBPathStr, sizeof(encoder->UserDBPathStr), DbNameStr, sizeof(encoder->UserDBPathStr));
-		
+#endif
+
 	}
 #elif __APPLE_REMOVE__
 	{
@@ -838,14 +866,14 @@ void WriteLastGUIDAndFrame(DECODER *decoder, int checkdiskinfotime)
                             lastGUID.Data4[6],
                             lastGUID.Data4[7]);
                     RegSetValueEx(key, REG_COLORPROCESSING_LAST_GUID_KEY,
-                                  0, REG_SZ, (BYTE*)TextGUID, lstrlen(TextGUID));
+                                  0, REG_SZ, (BYTE*)TextGUID, lstrlenA(TextGUID));
                     
                     DWORD value = decoder->codec.unique_framenumber;
                     RegSetValueEx(key, REG_COLORPROCESSING_FRAME_COUNT_KEY,
                                   0, REG_DWORD, (BYTE*)&value, sizeof(value));
                     
                     RegSetValueEx(key, REG_COLORPROCESSING_LAST_TIMECODE_KEY,
-                                  0, REG_SZ, (BYTE*)cfhddata->FileTimecodeData.orgtime, lstrlen(cfhddata->FileTimecodeData.orgtime));
+                                  0, REG_SZ, (BYTE*)cfhddata->FileTimecodeData.orgtime, lstrlenA(cfhddata->FileTimecodeData.orgtime));
                 }
             }
             
@@ -1551,14 +1579,14 @@ void OverrideCFHDDATA(DECODER *decoder, unsigned char *lpCurrentBuffer, int nWor
 							lastGUID.Data4[6],
 							lastGUID.Data4[7]);
 				RegSetValueEx(key, REG_COLORPROCESSING_LAST_GUID_KEY,
-					0, REG_SZ, (BYTE*)TextGUID, lstrlen(TextGUID));
+					0, REG_SZ, (BYTE*)TextGUID, lstrlenA(TextGUID));
 
 				DWORD value = decoder->codec.unique_framenumber;
 				RegSetValueEx(key, REG_COLORPROCESSING_FRAME_COUNT_KEY,
 					0, REG_DWORD, (BYTE*)&value, sizeof(value));
 
 				RegSetValueEx(key, REG_COLORPROCESSING_LAST_TIMECODE_KEY,
-					0, REG_SZ, (BYTE*)cfhddata->FileTimecodeData.orgtime, lstrlen(cfhddata->FileTimecodeData.orgtime));
+					0, REG_SZ, (BYTE*)cfhddata->FileTimecodeData.orgtime, lstrlenA(cfhddata->FileTimecodeData.orgtime));
 			}
 		}
 

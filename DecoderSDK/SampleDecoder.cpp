@@ -648,7 +648,7 @@ CSampleDecoder::SetLicense(const unsigned char *licenseKey)
 	{
 		errorCode = CFHD_ERROR_LICENSING;
 #ifdef _WIN32
-		OutputDebugString("m_decoder is NULL, can't set the license");
+		OutputDebugStringA("m_decoder is NULL, can't set the license");
 #endif
 	}
 
@@ -1249,7 +1249,7 @@ CSampleDecoder::PrepareDecoder(int outputWidth,
 #if _WIN32
 		char message[256];
 		sprintf_s(message, sizeof(message), "CSampleDecoder::PrepareDecoder caught internal codec error\n");
-		OutputDebugString(message);
+		OutputDebugStringA(message);
 #endif
 		return CFHD_ERROR_INTERNAL;
 	}
@@ -1369,7 +1369,7 @@ CSampleDecoder::ParseSampleHeader(void *samplePtr,
 #if _WIN32
 		char message[256];
 		sprintf_s(message, sizeof(message), "CSampleDecoder::PrepareDecoder caught internal codec error\n");
-		OutputDebugString(message);
+		OutputDebugStringA(message);
 #endif
 		return CFHD_ERROR_INTERNAL;
 	}
@@ -1561,7 +1561,7 @@ CSampleDecoder::DecodeSample(void *samplePtr,
 		{
 #if _WIN32
 // #if DEBUG
-			OutputDebugString("::DecodeSample: Unexpected error");
+			OutputDebugStringA("::DecodeSample: Unexpected error");
 			char tt[100];
 			int err = 0;
 			FILE *fp;
@@ -1614,7 +1614,7 @@ CSampleDecoder::DecodeSample(void *samplePtr,
 #if _WIN32
 		char message[256];
 		sprintf_s(message, sizeof(message), "CSampleDecoder::PrepareDecoder caught internal codec error\n");
-		OutputDebugString(message);
+		OutputDebugStringA(message);
 #endif
 		return CFHD_ERROR_INTERNAL;
 	}

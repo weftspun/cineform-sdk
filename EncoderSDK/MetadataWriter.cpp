@@ -23,7 +23,9 @@
 #include "StdAfx.h"
 //#include "Interface.h"
 
-#ifndef _WIN32
+#ifdef _WIN32
+#include <objbase.h>
+#else
 #include <uuid/uuid.h>
 #endif
 

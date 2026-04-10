@@ -822,7 +822,7 @@ IMAGE *CreateWaveletFromArray(PIXEL *array, int width, int height, int pitch, in
 	else
 	{
 #if (DEBUG && _WIN32)
-		OutputDebugString("CreateWaveletFromArray sizeof(IMAGE)");
+		OutputDebugStringA("CreateWaveletFromArray sizeof(IMAGE)");
 #endif
 		assert(wavelet != NULL);
 	}
@@ -858,7 +858,7 @@ IMAGE *CreateWaveletEx(int width, int height, int level, int type)
 	else
 	{
 #if (DEBUG && _WIN32)
-		OutputDebugString("CreateWaveletEx sizeof(IMAGE)");
+		OutputDebugStringA("CreateWaveletEx sizeof(IMAGE)");
 #endif
 		assert(wavelet != NULL);
 	}
@@ -1224,7 +1224,7 @@ void AllocTransform(TRANSFORM *transform, int type, int width, int height, int n
 		if(wavelet == NULL)
 		{
 #if (DEBUG && _WIN32)
-			OutputDebugString("AllocTransform sizeof(IMAGE))");
+			OutputDebugStringA("AllocTransform sizeof(IMAGE))");
 #endif
 			assert(wavelet != NULL);
 		}
@@ -1234,7 +1234,7 @@ void AllocTransform(TRANSFORM *transform, int type, int width, int height, int n
 		if(wavelet == NULL)
 		{
 #if (DEBUG && _WIN32)
-			OutputDebugString("AllocTransform sizeof(IMAGE))");
+			OutputDebugStringA("AllocTransform sizeof(IMAGE))");
 #endif
 			assert(wavelet != NULL);
 		}
@@ -1258,7 +1258,7 @@ void AllocTransform(TRANSFORM *transform, int type, int width, int height, int n
 			if(wavelet == NULL)
 			{
 #if (DEBUG && _WIN32)
-				OutputDebugString("AllocTransform sizeof(IMAGE))");
+				OutputDebugStringA("AllocTransform sizeof(IMAGE))");
 #endif
 				assert(wavelet != NULL);
 			}
@@ -1268,7 +1268,7 @@ void AllocTransform(TRANSFORM *transform, int type, int width, int height, int n
 			if(wavelet == NULL)
 			{
 #if (DEBUG && _WIN32)
-				OutputDebugString("AllocTransform sizeof(IMAGE))");
+				OutputDebugStringA("AllocTransform sizeof(IMAGE))");
 #endif
 				assert(wavelet != NULL);
 			}
@@ -1315,7 +1315,7 @@ void AllocTransform(TRANSFORM *transform, int type, int width, int height, int n
 		if(wavelet == NULL)
 		{
 #if (DEBUG && _WIN32)
-			OutputDebugString("AllocTransform sizeof(IMAGE))");
+			OutputDebugStringA("AllocTransform sizeof(IMAGE))");
 #endif
 			assert(wavelet != NULL);
 		}
@@ -1325,7 +1325,7 @@ void AllocTransform(TRANSFORM *transform, int type, int width, int height, int n
 		if(wavelet == NULL)
 		{
 #if (DEBUG && _WIN32)
-			OutputDebugString("AllocTransform sizeof(IMAGE))");
+			OutputDebugStringA("AllocTransform sizeof(IMAGE))");
 #endif
 			assert(wavelet != NULL);
 		}
@@ -1338,7 +1338,7 @@ void AllocTransform(TRANSFORM *transform, int type, int width, int height, int n
 		if(wavelet == NULL)
 		{
 #if (DEBUG && _WIN32)
-			OutputDebugString("AllocTransform sizeof(IMAGE))");
+			OutputDebugStringA("AllocTransform sizeof(IMAGE))");
 #endif
 			assert(wavelet != NULL);
 		}
@@ -1348,7 +1348,7 @@ void AllocTransform(TRANSFORM *transform, int type, int width, int height, int n
 		if(wavelet == NULL)
 		{
 #if (DEBUG && _WIN32)
-			OutputDebugString("AllocTransform sizeof(IMAGE))");
+			OutputDebugStringA("AllocTransform sizeof(IMAGE))");
 #endif
 			assert(wavelet != NULL);
 		}
@@ -1365,7 +1365,7 @@ void AllocTransform(TRANSFORM *transform, int type, int width, int height, int n
 		if(wavelet == NULL)
 		{
 #if (DEBUG && _WIN32)
-			OutputDebugString("AllocTransform sizeof(IMAGE))");
+			OutputDebugStringA("AllocTransform sizeof(IMAGE))");
 #endif
 			assert(wavelet != NULL);
 		}
@@ -1375,7 +1375,7 @@ void AllocTransform(TRANSFORM *transform, int type, int width, int height, int n
 		if(wavelet == NULL)
 		{
 #if (DEBUG && _WIN32)
-			OutputDebugString("AllocTransform sizeof(IMAGE))");
+			OutputDebugStringA("AllocTransform sizeof(IMAGE))");
 #endif
 			assert(wavelet != NULL);
 		}
@@ -1395,7 +1395,7 @@ void AllocTransform(TRANSFORM *transform, int type, int width, int height, int n
 			if(wavelet == NULL)
 			{
 #if (DEBUG && _WIN32)
-				OutputDebugString("AllocTransform sizeof(IMAGE))");
+				OutputDebugStringA("AllocTransform sizeof(IMAGE))");
 #endif
 				assert(wavelet != NULL);
 			}
@@ -1405,7 +1405,7 @@ void AllocTransform(TRANSFORM *transform, int type, int width, int height, int n
 			if(wavelet == NULL)
 			{
 #if (DEBUG && _WIN32)
-				OutputDebugString("AllocTransform sizeof(IMAGE))");
+				OutputDebugStringA("AllocTransform sizeof(IMAGE))");
 #endif
 				assert(wavelet != NULL);
 			}
@@ -1454,7 +1454,7 @@ void AllocTransform(TRANSFORM *transform, int type, int width, int height, int n
 		if(wavelet == NULL)
 		{
 #if (DEBUG && _WIN32)
-			OutputDebugString("AllocTransform sizeof(IMAGE))");
+			OutputDebugStringA("AllocTransform sizeof(IMAGE))");
 #endif
 			assert(wavelet != NULL);
 		}
@@ -1464,7 +1464,7 @@ void AllocTransform(TRANSFORM *transform, int type, int width, int height, int n
 		if(wavelet == NULL)
 		{
 #if (DEBUG && _WIN32)
-			OutputDebugString("AllocTransform sizeof(IMAGE))");
+			OutputDebugStringA("AllocTransform sizeof(IMAGE))");
 #endif
 			assert(wavelet != NULL);
 		}
@@ -1477,7 +1477,7 @@ void AllocTransform(TRANSFORM *transform, int type, int width, int height, int n
 		if(wavelet == NULL)
 		{
 #if (DEBUG && _WIN32)
-			OutputDebugString("AllocTransform sizeof(IMAGE))");
+			OutputDebugStringA("AllocTransform sizeof(IMAGE))");
 #endif
 			assert(wavelet != NULL);
 		}
@@ -1487,7 +1487,7 @@ void AllocTransform(TRANSFORM *transform, int type, int width, int height, int n
 		if(wavelet == NULL)
 		{
 #if (DEBUG && _WIN32)
-			OutputDebugString("AllocTransform sizeof(IMAGE))");
+			OutputDebugStringA("AllocTransform sizeof(IMAGE))");
 #endif
 			assert(wavelet != NULL);
 		}
@@ -1504,7 +1504,7 @@ void AllocTransform(TRANSFORM *transform, int type, int width, int height, int n
 		if(wavelet == NULL)
 		{
 #if (DEBUG && _WIN32)
-			OutputDebugString("AllocTransform sizeof(IMAGE))");
+			OutputDebugStringA("AllocTransform sizeof(IMAGE))");
 #endif
 			assert(wavelet != NULL);
 		}
@@ -1514,7 +1514,7 @@ void AllocTransform(TRANSFORM *transform, int type, int width, int height, int n
 		if(wavelet == NULL)
 		{
 #if (DEBUG && _WIN32)
-			OutputDebugString("AllocTransform sizeof(IMAGE))");
+			OutputDebugStringA("AllocTransform sizeof(IMAGE))");
 #endif
 			assert(wavelet != NULL);
 		}
@@ -1535,7 +1535,7 @@ void AllocTransform(TRANSFORM *transform, int type, int width, int height, int n
 		if(wavelet == NULL)
 		{
 #if (DEBUG && _WIN32)
-			OutputDebugString("AllocTransform sizeof(IMAGE))");
+			OutputDebugStringA("AllocTransform sizeof(IMAGE))");
 #endif
 			assert(wavelet != NULL);
 		}
@@ -1545,7 +1545,7 @@ void AllocTransform(TRANSFORM *transform, int type, int width, int height, int n
 		if(wavelet == NULL)
 		{
 #if (DEBUG && _WIN32)
-			OutputDebugString("AllocTransform sizeof(IMAGE))");
+			OutputDebugStringA("AllocTransform sizeof(IMAGE))");
 #endif
 			assert(wavelet != NULL);
 		}
@@ -1559,7 +1559,7 @@ void AllocTransform(TRANSFORM *transform, int type, int width, int height, int n
 		if(wavelet == NULL)
 		{
 #if (DEBUG && _WIN32)
-			OutputDebugString("AllocTransform sizeof(IMAGE))");
+			OutputDebugStringA("AllocTransform sizeof(IMAGE))");
 #endif
 			assert(wavelet != NULL);
 		}
@@ -1569,7 +1569,7 @@ void AllocTransform(TRANSFORM *transform, int type, int width, int height, int n
 		if(wavelet == NULL)
 		{
 #if (DEBUG && _WIN32)
-			OutputDebugString("AllocTransform sizeof(IMAGE))");
+			OutputDebugStringA("AllocTransform sizeof(IMAGE))");
 #endif
 			assert(wavelet != NULL);
 		}
@@ -1586,7 +1586,7 @@ void AllocTransform(TRANSFORM *transform, int type, int width, int height, int n
 		if(wavelet == NULL)
 		{
 #if (DEBUG && _WIN32)
-			OutputDebugString("AllocTransform sizeof(IMAGE))");
+			OutputDebugStringA("AllocTransform sizeof(IMAGE))");
 #endif
 			assert(wavelet != NULL);
 		}
@@ -1596,7 +1596,7 @@ void AllocTransform(TRANSFORM *transform, int type, int width, int height, int n
 		if(wavelet == NULL)
 		{
 #if (DEBUG && _WIN32)
-			OutputDebugString("AllocTransform sizeof(IMAGE))");
+			OutputDebugStringA("AllocTransform sizeof(IMAGE))");
 #endif
 			assert(wavelet != NULL);
 		}

@@ -246,7 +246,7 @@ IMAGE *CreateImage(int width, int height)
 	else
 	{
 #if (DEBUG && _WIN32)
-		OutputDebugString("CreateImage sizeof(IMAGE)");
+		OutputDebugStringA("CreateImage sizeof(IMAGE)");
 #endif
 	}
 
@@ -547,7 +547,7 @@ IMAGE *CreateImageFromArray(PIXEL *array, int width, int height, int pitch)
 	else
 	{
 #if (DEBUG && _WIN32)
-		OutputDebugString("CreateImageFromArray sizeof(IMAGE)");
+		OutputDebugStringA("CreateImageFromArray sizeof(IMAGE)");
 #endif
 		assert(image != NULL);
 	}
@@ -611,7 +611,7 @@ IMAGE *CreateWaveletBandFromArray(PIXEL *array, int width, int height, int pitch
 	else
 	{
 #if (DEBUG && _WIN32)
-		OutputDebugString("wavelet sizeof(IMAGE)");
+		OutputDebugStringA("wavelet sizeof(IMAGE)");
 #endif
 		assert(wavelet != NULL);
 	}

@@ -58,55 +58,68 @@ void InitGetLUTPaths(char *pPathStr, size_t pathSize, char *pDBStr, size_t DBSiz
 #ifdef _WIN32
 		DWORD dwType = REG_SZ, length = 260;
 		HKEY hKey = 0;
-		const char* CPsubkey = "SOFTWARE\\CineForm\\ColorProcessing";
+		const TCHAR* CPsubkey = TEXT("SOFTWARE\\CineForm\\ColorProcessing");
 
-		char defaultLUTpath[260] = "NONE";
-		char defaultOverridePath[260] = "";
-		char DbNameStr[64] = "db";
+		const size_t max_path_len = 260;
+		const size_t max_name_len = 64;
+		TCHAR defaultLUTpath[max_path_len] = TEXT("NONE");
+		TCHAR defaultOverridePath[max_path_len] = TEXT("");
+		TCHAR DbNameStr[max_name_len] = TEXT("db");
 
 		RegOpenKey(HKEY_CURRENT_USER, CPsubkey, &hKey);
 		if (hKey != 0)
 		{
 			length = 260;
-			RegQueryValueEx(hKey, "LUTPath", NULL, &dwType, (LPBYTE)defaultLUTpath, &length);
+			RegQueryValueEx(hKey, TEXT("LUTPath"), NULL, &dwType, (LPBYTE)defaultLUTpath, &length);
 			length = 260;
-			RegQueryValueEx(hKey, "OverridePath", NULL, &dwType, (LPBYTE)defaultOverridePath, &length);
+			RegQueryValueEx(hKey, TEXT("OverridePath"), NULL, &dwType, (LPBYTE)defaultOverridePath, &length);
 			length = 64;
-			RegQueryValueEx(hKey, "DBPath", NULL, &dwType, (LPBYTE)DbNameStr, &length);
+			RegQueryValueEx(hKey, TEXT("DBPath"), NULL, &dwType, (LPBYTE)DbNameStr, &length);
 		}
 
-		if (0 == strcmp(defaultLUTpath, "NONE"))
+		if (0 == wcscmp(defaultLUTpath, TEXT("NONE")))
 		{
 			int n;
-			char PublicPath[80];
+			TCHAR PublicPath[80];
 
-			if (n = GetEnvironmentVariable("PUBLIC", PublicPath, 79)) // Vista and Win7
+			if (n = GetEnvironmentVariable(TEXT("PUBLIC"), PublicPath, 79)) // Vista and Win7
 			{
-				_stprintf_s(defaultLUTpath, sizeof(defaultLUTpath), _T("%s\\%s"), PublicPath, _T("CineForm\\LUTs")); //Vista & 7 default
-				_stprintf_s(defaultOverridePath, sizeof(defaultOverridePath), _T("%s\\%s"), PublicPath, _T("CineForm\\LUTs")); //Vista & 7 default
+				_stprintf_s(defaultLUTpath, max_path_len, TEXT("%s\\%s"), PublicPath, TEXT("CineForm\\LUTs")); //Vista & 7 default
+				_stprintf_s(defaultOverridePath, max_path_len, TEXT("%s\\%s"), PublicPath, TEXT("CineForm\\LUTs")); //Vista & 7 default
 			}
 			else
 			{
-				const char* CVsubkey = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion";
+				const TCHAR* CVsubkey = TEXT("SOFTWARE\\Microsoft\\Windows\\CurrentVersion");
 				RegOpenKey(HKEY_LOCAL_MACHINE, CVsubkey, &hKey);
 				if (hKey != 0)
 				{
-					char commonpath[64] = "NONE";
+					TCHAR commonpath[64] = TEXT("NONE");
 					length = 64;
-					RegQueryValueEx(hKey, "CommonFilesDir (x86)", NULL, &dwType, (LPBYTE)commonpath, &length);
-					if (0 == strcmp(commonpath, "NONE"))
+					RegQueryValueEx(hKey, TEXT("CommonFilesDir (x86)"), NULL, &dwType, (LPBYTE)commonpath, &length);
+					if (0 == wcscmp(commonpath, TEXT("NONE")))
 					{
 						length = 64;
-						RegQueryValueEx(hKey, "CommonFilesDir", NULL, &dwType, (LPBYTE)commonpath, &length);
+						RegQueryValueEx(hKey, TEXT("CommonFilesDir"), NULL, &dwType, (LPBYTE)commonpath, &length);
 					}
-					_stprintf_s(defaultLUTpath, sizeof(defaultLUTpath), _T("%s\\%s"), commonpath, _T("CineForm\\LUTs"));
-					_stprintf_s(defaultOverridePath, sizeof(defaultOverridePath), _T("%s\\%s"), commonpath, _T("CineForm\\LUTs"));
+					_stprintf_s(defaultLUTpath, max_path_len, TEXT("%s\\%s"), commonpath, TEXT("CineForm\\LUTs"));
+					_stprintf_s(defaultOverridePath, max_path_len, TEXT("%s\\%s"), commonpath, TEXT("CineForm\\LUTs"));
 				}
 			}
 		}
 
+		// I found that the old code was not actually unicode safe, despite the attempt to be.
+		// I don't want to change the encoder and decoder structures at this time,
+		// so I am converting the strings back to multibyte before copying them into the structures.
+		// This is not ideal, but it is better than the previous code which could potentially write
+		// past the end of the buffers if the registry values were too long.
+#if defined(UNICODE) || defined(_UNICODE)
+		size_t result_length = 0;
+		wcstombs_s(&result_length, pPathStr, pathSize, defaultLUTpath, 259);
+		wcstombs_s(&result_length, pDBStr, DBSize, DbNameStr, 63);
+#else
 		strncpy_s(pPathStr, pathSize, defaultLUTpath, 259);
 		strncpy_s(pDBStr, DBSize, DbNameStr, 63);
+#endif
 
 #elif __APPLE_REMOVE__
 

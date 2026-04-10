@@ -397,7 +397,7 @@ uint32_t GetLastWriteTime(char *name)
     FILETIME ftCreate, ftAccess, ftWrite;
 	uint32_t ret = 0;
 
-    hFile = CreateFile(name, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+    hFile = CreateFileA(name, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
     if(hFile == INVALID_HANDLE_VALUE)
     {
         return 0;

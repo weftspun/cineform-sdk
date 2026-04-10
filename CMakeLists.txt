@@ -1,6 +1,10 @@
 # CMakeLists.txt
-cmake_minimum_required (VERSION 3.5.1)
-project (CineFormSDK)
+cmake_minimum_required(VERSION 4.2)
+
+project (CineFormSDK
+	DESCRIPTION "Desktop Core Tech Library"
+	LANGUAGES C CXX
+)
 
 # Build settings
 option(BUILD_LIBS "Build codec libraries" ON)
@@ -8,8 +12,7 @@ option(BUILD_TOOLS "Build test tools" ON)
 option(BUILD_STATIC "Build static component" ON)
 option(BUILD_SEPARATED "Build a separate de/encoder libraries" OFF)
 
-set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
-add_definitions(-D_ALLOCATOR=1 -DWARPSTUFF=1)
+add_definitions(-D_ALLOCATOR=1 -DWARPSTUFF=1 -D_UNICODE=1)
 
 find_package(OpenMP)
 
@@ -34,7 +37,6 @@ if (OPENMP_FOUND)
 endif (OPENMP_FOUND)
 string(STRIP ${ADDITIONAL_LIBS} ADDITIONAL_LIBS)
 
-include_directories("Common" "Tables" "Codec" "ConvertLib" "WarpLib" "Example")
 file(GLOB CODEC_SOURCES "Codec/*.c" "Codec/*.h" "Codec/*.cpp" "WarpLib/*.c" "WarpLib/*.h" )
 file(GLOB ENCODER_SOURCES "EncoderSDK/*.cpp" "Common/*.h")
 file(GLOB DECODER_SOURCES "DecoderSDK/*.cpp" "Common/*.h" "WarpLib/*.c" "WarpLib/*.h" "ConvertLib/*.cpp" "ConvertLib/*.h" )
@@ -48,12 +50,59 @@ if (BUILD_LIBS)
 		if (BUILD_SEPARATED)
 			add_library(CFHDEncoderStatic STATIC ${CODEC_SOURCES} ${ENCODER_SOURCES})
 			add_library(CFHDDecoderStatic STATIC ${CODEC_SOURCES} ${DECODER_SOURCES})
+
+			set_target_properties(CFHDEncoderStatic PROPERTIES
+			    FOLDER Media
+			    OUTPUT_NAME CFHDEncoderStatic
+			    CXX_STANDARD 17
+				C_STANDARD 11
+			)
+			
+			set_target_properties(CFHDDecoderStatic PROPERTIES
+			    FOLDER Media
+			    OUTPUT_NAME CFHDDecoderStatic
+			    CXX_STANDARD 17
+				C_STANDARD 11
+			)
+
 			target_compile_options(CFHDEncoderStatic PUBLIC ${COMPILER_FLAGS})
 			target_compile_options(CFHDDecoderStatic PUBLIC ${COMPILER_FLAGS})		
+			
 			target_link_libraries (CFHDEncoderStatic)
 			target_link_libraries (CFHDDecoderStatic)
+
+			target_include_directories(CFHDEncoderStatic
+				PUBLIC
+					Common
+				PRIVATE
+					Codec
+					Tables
+					ConvertLib
+					WarpLib
+					Example
+			)
+
+			target_include_directories(CFHDDecoderStatic
+				PUBLIC
+					Common
+				PRIVATE
+					Codec
+					Tables
+					ConvertLib
+					WarpLib
+					Example
+			)
+
 		else (BUILD_SEPARATED)
 			add_library(CFHDCodecStatic STATIC ${CODEC_SOURCES} ${ENCODER_SOURCES} ${DECODER_SOURCES})
+
+			set_target_properties(CFHDCodecStatic PROPERTIES
+			    FOLDER Media
+			    OUTPUT_NAME CFHDCodecStatic
+			    CXX_STANDARD 17
+				C_STANDARD 11
+			)
+			
 			target_compile_options(CFHDCodecStatic PUBLIC ${COMPILER_FLAGS})
 		
 			set_target_properties(CFHDCodecStatic PROPERTIES POSITION_INDEPENDENT_CODE ON)
@@ -62,24 +111,93 @@ if (BUILD_LIBS)
 			endif (UNIX)
 		
 			target_link_libraries(CFHDCodecStatic)
+
+			target_include_directories(CFHDCodecStatic
+				PUBLIC
+					Common
+				PRIVATE
+					Codec
+					Tables
+					ConvertLib
+					WarpLib
+					Example
+			)
 		endif (BUILD_SEPARATED)
 	else (BUILD_STATIC)
 		if (BUILD_SEPARATED)
 			add_library(CFHDEncoder SHARED ${CODEC_SOURCES} ${ENCODER_SOURCES})
 			add_library(CFHDDecoder SHARED ${CODEC_SOURCES} ${DECODER_SOURCES})
+
+			set_target_properties(CFHDEncoder PROPERTIES
+			    FOLDER Media
+			    OUTPUT_NAME CFHDEncoder
+			    CXX_STANDARD 17
+				C_STANDARD 11
+			)
+			
+			set_target_properties(CFHDDecoder PROPERTIES
+			    FOLDER Media
+			    OUTPUT_NAME CFHDDecoder
+			    CXX_STANDARD 17
+				C_STANDARD 11
+			)
+
 			target_compile_options(CFHDEncoder PUBLIC ${COMPILER_FLAGS})
 			target_compile_options(CFHDDecoder PUBLIC ${COMPILER_FLAGS})
+			
 			target_compile_definitions(CFHDEncoder PUBLIC -DDYNAMICLIB=1)
 			target_compile_definitions(CFHDDecoder PUBLIC -DDYNAMICLIB=1)
+			
 			target_link_libraries (CFHDEncoder)
 			target_link_libraries (CFHDDecoder)
+
+			target_include_directories(CFHDEncoder
+				PUBLIC
+					Common
+				PRIVATE
+					Codec
+					Tables
+					ConvertLib
+					WarpLib
+					Example
+			)
+
+			target_include_directories(CFHDDecoder
+				PUBLIC
+					Common
+				PRIVATE
+					Codec
+					Tables
+					ConvertLib
+					WarpLib
+					Example
+			)
 		else (BUILD_SEPARATED)
 			add_library(CFHDCodecShared SHARED ${CODEC_SOURCES} ${ENCODER_SOURCES} ${DECODER_SOURCES})
+
+			set_target_properties(CFHDCodecShared PROPERTIES
+			    FOLDER Media
+			    OUTPUT_NAME CFHDCodec
+			    CXX_STANDARD 17
+				C_STANDARD 11
+				POSITION_INDEPENDENT_CODE ON
+			)
+
 			target_compile_options(CFHDCodecShared PUBLIC ${COMPILER_FLAGS})
 			target_compile_definitions(CFHDCodecShared PUBLIC -DDYNAMICLIB=1 -DCODECCOMBINED=1)
+			
 			target_link_libraries(CFHDCodecShared)
-			set_target_properties(CFHDCodecShared PROPERTIES POSITION_INDEPENDENT_CODE ON)
-			set_target_properties(CFHDCodecShared PROPERTIES OUTPUT_NAME CFHDCodec)
+
+			target_include_directories(CFHDCodecShared
+				PUBLIC
+					Common
+				PRIVATE
+					Codec
+					Tables
+					ConvertLib
+					WarpLib
+					Example
+			)
 		endif (BUILD_SEPARATED)
 	endif (BUILD_STATIC)
 endif (BUILD_LIBS)
@@ -88,6 +206,14 @@ endif (BUILD_LIBS)
 if (BUILD_TOOLS)
     # TestCFHD
 	add_executable(TestCFHD ${EXAMPLE_SOURCE})
+
+	set_target_properties(TestCFHD PROPERTIES
+		FOLDER Media/Tests
+		OUTPUT_NAME TestCFHD
+		CXX_STANDARD 17
+		C_STANDARD 11
+	)
+
 	if (OPENMP_FOUND)
 		target_compile_options(TestCFHD PRIVATE ${OpenMP_CXX_FLAGS})
 	endif ()
@@ -109,37 +235,13 @@ if (BUILD_TOOLS)
 
     # WaveletDemo
     add_executable(WaveletDemo ${WAVELETDEMO_SOURCE})
+
+	set_target_properties(WaveletDemo PROPERTIES
+	    FOLDER Media/Tools
+	    OUTPUT_NAME WaveletDemo
+	    CXX_STANDARD 17
+		C_STANDARD 11
+	)
+
     target_link_libraries(WaveletDemo ${TOY_LIBS})
 endif (BUILD_TOOLS)
-
-
-# pkg-config integration
-set(PROJECT_VERSION "10.0.2")
-set(LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)")
-set(EXEC_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX} CACHE PATH "Installation prefix for executables and object code libraries" FORCE)
-set(BIN_INSTALL_DIR ${EXEC_INSTALL_PREFIX}/bin CACHE PATH "Installation prefix for user executables" FORCE)
-set(LIB_INSTALL_DIR ${EXEC_INSTALL_PREFIX}/lib${LIB_SUFFIX} CACHE PATH "Installation prefix for object code libraries" FORCE)
-set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/include/cineformsdk CACHE PATH "Installation prefix for header files" FORCE)
-
-# System wide installation
-if (BUILD_STATIC)
-	if (BUILD_SEPARATED)
-		set(TARGET_NAMES CFHDEncoderStatic CFHDDecoderStatic)
-	else (BUILD_SEPARATED)
-		set(TARGET_NAMES CFHDCodecStatic)
-	endif (BUILD_SEPARATED)
-else (BUILD_STATIC)
-	if (BUILD_SEPARATED)
-		set(TARGET_NAMES CFHDEncoder CFHDDecoder)
-	else (BUILD_SEPARATED)
-		set(TARGET_NAMES CFHDCodecShared)
-	endif (BUILD_SEPARATED)
-endif (BUILD_STATIC)
-foreach(TARGET_NAME ${TARGET_NAMES})
-    set(LIB_INSTALL_NAMES ${LIB_INSTALL_NAMES} -l${TARGET_NAME})
-endforeach()
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libcineformsdk.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/libcineformsdk.pc)
-
-install(TARGETS ${TARGET_NAMES} DESTINATION lib/)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libcineformsdk.pc DESTINATION lib/pkgconfig)
-install(FILES ${PUBLIC_HEADERS} DESTINATION ${INCLUDE_INSTALL_DIR})
