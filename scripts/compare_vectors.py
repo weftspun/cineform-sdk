@@ -12,15 +12,36 @@ printed to one decimal and a boundary case can round either way.
 import re, sys
 
 LINE = re.compile(r"\s*(\d+): source (\d+) compressed to (\d+).*PSNR ([\d.]+)dB")
+FMT = re.compile(r"\s*Pixel format:\s+(\S+)")
+ENC = re.compile(r"\s*Encode:\s+(\S+)")
+DEC = re.compile(r"\s*Decode:\s+(.+?)\s*$")
 PSNR_TOLERANCE_DB = 0.2
+
+# "byte-identical" below means the compressed SIZE matched. Two bitstreams can be the
+# same length and hold different bytes, which is exactly what this codec does across
+# architectures: every size matched while twelve frames decoded 30-45 dB apart. The
+# size is what TestCFHD prints, so it is what can be compared without shipping the
+# streams themselves; the PSNR column is what catches content differing under it.
 
 
 def parse(path):
+    """Rows carry the mode they were produced under, so a failure names the path."""
     rows = []
+    fmt = enc = dec = "?"
     for line in open(path, errors="ignore"):
+        mf = FMT.match(line)
+        if mf:
+            fmt = mf.group(1); continue
+        me = ENC.match(line)
+        if me:
+            enc = me.group(1); continue
+        md = DEC.match(line)
+        if md:
+            dec = md.group(1); continue
         m = LINE.match(line)
         if m:
-            rows.append((int(m.group(1)), int(m.group(3)), float(m.group(4))))
+            rows.append((int(m.group(1)), int(m.group(3)), float(m.group(4)),
+                         f"{fmt}/{enc}/{dec}"))
     return rows
 
 
@@ -33,11 +54,11 @@ def main(a_path, b_path, a_name, b_name):
         print(f"frame count differs: {a_name} {len(a)}, {b_name} {len(b)}")
         return 1
 
-    print(f"{'#':>4} {a_name:>12} {b_name:>12} {'delta':>7} {'ppm':>8}  {'psnr A':>7} {'psnr B':>7}")
+    print(f"{'#':>4} {a_name:>12} {b_name:>12} {'delta':>7} {'ppm':>8}  {'psnr A':>7} {'psnr B':>7}  mode")
     identical = 0
     worst_bytes = 0
     psnr_failures = []
-    for (fa, sa, pa), (fb, sb, pb) in zip(a, b):
+    for (fa, sa, pa, mode), (fb, sb, pb, _m2) in zip(a, b):
         d = sa - sb
         ppm = abs(d) / sb * 1e6 if sb else 0
         if d == 0:
@@ -45,9 +66,9 @@ def main(a_path, b_path, a_name, b_name):
         worst_bytes = max(worst_bytes, abs(d))
         flag = ""
         if abs(pa - pb) > PSNR_TOLERANCE_DB:
-            psnr_failures.append((fa, pa, pb))
+            psnr_failures.append((fa, pa, pb, mode))
             flag = "  <-- PSNR"
-        print(f"{fa:>4} {sa:>12} {sb:>12} {d:>+7} {ppm:>8.1f}  {pa:>7.1f} {pb:>7.1f}{flag}")
+        print(f"{fa:>4} {sa:>12} {sb:>12} {d:>+7} {ppm:>8.1f}  {pa:>7.1f} {pb:>7.1f}  {mode}{flag}")
 
     print()
     print(f"frames compared    : {len(a)}")
@@ -60,8 +81,14 @@ def main(a_path, b_path, a_name, b_name):
     if psnr_failures:
         print()
         print(f"FAIL: {len(psnr_failures)} frame(s) differ by more than {PSNR_TOLERANCE_DB} dB")
-        for f, pa, pb in psnr_failures:
-            print(f"  frame {f}: {a_name} {pa} dB vs {b_name} {pb} dB")
+        for f, pa, pb, mode in psnr_failures:
+            print(f"  frame {f} [{mode}]: {a_name} {pa} dB vs {b_name} {pb} dB")
+        from collections import Counter
+        by_mode = Counter(m for _, _, _, m in psnr_failures)
+        print()
+        print("  failures by mode:")
+        for m, n in by_mode.most_common():
+            print(f"    {n:>3}x  {m}")
         return 1
 
     if identical == len(a):
