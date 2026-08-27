@@ -58,9 +58,33 @@ def main(a_path, b_path, a_name, b_name):
     if not a or not b:
         print(f"no vectors parsed ({a_name}: {len(a)}, {b_name}: {len(b)})")
         return 1
-    if len(a) != len(b):
-        print(f"frame count differs: {a_name} {len(a)}, {b_name} {len(b)}")
+
+    # Match frames by identity rather than by position. TestCFHD is multi-threaded and
+    # writes progress as it goes, so a line occasionally arrives garbled and one side
+    # parses 399 rows instead of 400. Zipping two lists positionally turned that into a
+    # total failure -- and worse, would have compared every subsequent frame against the
+    # wrong one. Keyed on (mode, occurrence within mode), a dropped line costs exactly
+    # the frame it was on.
+    # Keyed on (mode, frame number), both of which TestCFHD prints. An occurrence
+    # counter would have worked only until a line went missing: every frame after the
+    # gap would shift by one and compare against its neighbour, turning one lost line
+    # into a few hundred false mismatches. The printed frame number does not shift.
+    def keyed(rows):
+        return {(mode, frame): (frame, size, psnr, mode)
+                for frame, size, psnr, mode in rows}
+
+    ka, kb = keyed(a), keyed(b)
+    shared = sorted(set(ka) & set(kb))
+    only_a = sorted(set(ka) - set(kb))
+    only_b = sorted(set(kb) - set(ka))
+    if only_a or only_b:
+        print(f"note: {len(only_a)} frame(s) only in {a_name}, "
+              f"{len(only_b)} only in {b_name} — comparing the {len(shared)} in both")
+    if not shared:
+        print("no frames in common")
         return 1
+    a = [ka[k] for k in shared]
+    b = [kb[k] for k in shared]
 
     print(f"{'#':>4} {a_name:>12} {b_name:>12} {'delta':>7} {'ppm':>8}  {'psnr A':>7} {'psnr B':>7}  mode")
     identical = 0
