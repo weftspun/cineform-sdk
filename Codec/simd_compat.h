@@ -40,6 +40,14 @@
    Compiling on ARM cannot catch that; only building for x86 can. */
 #include <emmintrin.h>
 
+/* The aligned allocators live in their own Intel header, which GCC needs named
+   explicitly. Apple's clang folds them in elsewhere and has no such file, which is
+   why the codec guarded this with __APPLE__ rather than by architecture -- and why
+   an arm64 Linux builder was the first thing to fail on it. */
+#ifndef __APPLE__
+#include <mm_malloc.h>
+#endif
+
 #endif
 
 #endif /* SIMD_COMPAT_H */

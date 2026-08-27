@@ -51,7 +51,7 @@
 #else
 
 // The GCC compiler requires declaration of the aligned memory allocation routines
-#include <mm_malloc.h>
+#include "simd_compat.h"
 
 #ifndef INLINE
 #define INLINE inline
