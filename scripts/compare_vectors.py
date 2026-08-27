@@ -15,6 +15,14 @@ LINE = re.compile(r"\s*(\d+): source (\d+) compressed to (\d+).*PSNR ([\d.]+)dB"
 FMT = re.compile(r"\s*Pixel format:\s+(\S+)")
 ENC = re.compile(r"\s*Encode:\s+(\S+)")
 DEC = re.compile(r"\s*Decode:\s+(.+?)\s*$")
+# PSNR is NOT a gate, because it is not repeatable. The same binary run twice on one
+# machine differs on ~15 of 400 frames by more than 0.2 dB -- more frames than differ
+# between x86_64 and arm64 (12). Gating on it would fail runs at random and, worse,
+# would have attributed the codec's own nondeterminism to whatever change was under
+# test. It is reported so the number is visible, and it does not decide the job.
+#
+# Compressed size IS repeatable: 400/400 identical run-to-run and across both
+# architectures. That is what gates.
 PSNR_TOLERANCE_DB = 0.2
 
 # "byte-identical" below means the compressed SIZE matched. Two bitstreams can be the
@@ -75,13 +83,16 @@ def main(a_path, b_path, a_name, b_name):
     print(f"byte-identical     : {identical}/{len(a)}")
     print(f"largest size delta : {worst_bytes} bytes")
 
-    # Bitstreams differing is a recorded fact, not a failure: the shim is a port,
-    # not a bit-exact reimplementation. Quality diverging IS a failure, because
-    # that means a shim is wrong rather than merely rounding elsewhere.
+    if identical != len(a):
+        print()
+        print(f"FAIL: {len(a) - identical} frame(s) differ in compressed size")
+        return 1
+
     if psnr_failures:
         print()
-        print(f"FAIL: {len(psnr_failures)} frame(s) differ by more than {PSNR_TOLERANCE_DB} dB")
-        for f, pa, pb, mode in psnr_failures:
+        print(f"note: {len(psnr_failures)} frame(s) differ by more than {PSNR_TOLERANCE_DB} dB")
+        print("      (informational -- see the header: this test is not repeatable)")
+        for f, pa, pb, mode in psnr_failures[:12]:
             print(f"  frame {f} [{mode}]: {a_name} {pa} dB vs {b_name} {pb} dB")
         from collections import Counter
         by_mode = Counter(m for _, _, _, m in psnr_failures)
@@ -89,14 +100,12 @@ def main(a_path, b_path, a_name, b_name):
         print("  failures by mode:")
         for m, n in by_mode.most_common():
             print(f"    {n:>3}x  {m}")
-        return 1
 
-    if identical == len(a):
-        print("\nBit-identical across architectures.")
-    else:
-        print(f"\nNot bit-identical. Quality equivalent within {PSNR_TOLERANCE_DB} dB.")
-        print("Anything content-addressed must not mix architectures.")
+    print()
+    print("Compressed sizes identical on every frame.")
     return 0
+
+
 
 
 if __name__ == "__main__":
