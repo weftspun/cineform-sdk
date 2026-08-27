@@ -65,7 +65,14 @@ jobs:
                 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DBUILD_TOOLS=ON
           cmake --build build --parallel
 
+      # Pin the decoder's thread count. Unpinned it is min(cores, 16), and the runners
+      # do not agree on cores -- so the three machines were running three different
+      # thread counts and their output was never comparable. It also made the test
+      # disagree with itself: unpinned, two runs on one machine differ on ~15 of 400
+      # frames by more than 0.2 dB; pinned, they are identical on all 400 including PSNR.
       - name: Run the vectors
+        env:
+          CFHD_TEST_MAXCPUS: '1'
         run: ./build/TestCFHD -d | tee vectors-${{ matrix.label }}.txt
 
       - uses: actions/upload-artifact@v4
