@@ -21,6 +21,16 @@ if(NOT MSVC)
   add_compile_options(-ffp-contract=off)
 endif()
 
+# GCC on aarch64 needs the SIMD features named explicitly. sse2neon reaches for CRC and
+# crypto instructions, and where clang enables them by default for the host, GCC does not
+# and fails in the header rather than at the call. Apple clang never hits this, so it shows
+# up only on an arm64 Linux builder.
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|arm64|ARM64")
+  if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "GNU")
+    add_compile_options(-march=armv8-a+crc+crypto -flax-vector-conversions)
+  endif()
+endif()
+
 option(BUILD_LIBS "Build codec libraries" ON)
 option(BUILD_TOOLS "Build test tools" ON)
 option(BUILD_STATIC "Build static component" ON)
