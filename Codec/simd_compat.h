@@ -1,0 +1,41 @@
+/*! @file simd_compat.h
+
+	One include in place of <emmintrin.h>.
+
+	On x86 this is <emmintrin.h> and nothing else, so that target is bit-for-bit
+	what it was. On ARM it is sse2neon for the 128-bit surface, mmx2neon.h for the
+	64-bit one, and a posix_memalign pair for the two allocator intrinsics that
+	live in the same Intel header and are not vector operations at all.
+
+	WHY A HEADER RATHER THAN A BUILD FLAG. The includes were unconditional in 27
+	files. Guarding each one in place would put the same seven preprocessor lines
+	in 27 places, and the next file added would be written from the pattern next
+	to it -- unconditional again. One header is one place to be wrong.
+
+	(C) 2026 -- Apache-2.0 OR MIT, matching the workspace.
+*/
+#ifndef SIMD_COMPAT_H
+#define SIMD_COMPAT_H
+
+#if defined(__aarch64__) || defined(__ARM_NEON)
+
+/* sse2neon reads the SSE level from these; the codec targets SSE2. */
+#ifndef SSE2NEON_SUPPRESS_WARNINGS
+#define SSE2NEON_SUPPRESS_WARNINGS 1
+#endif
+#include "sse2neon.h"
+#include "mmx2neon.h"
+
+#include <stdlib.h>
+
+/* sse2neon supplies _mm_malloc and _mm_free as well, so nothing is added here.
+   They are allocator calls rather than instructions, which is why they are easy
+   to miss when auditing what a SIMD shim covers. */
+
+#else /* x86: unchanged */
+
+#include "simd_compat.h"
+
+#endif
+
+#endif /* SIMD_COMPAT_H */

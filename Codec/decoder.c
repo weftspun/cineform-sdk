@@ -60,7 +60,7 @@
 
 #include <stdio.h>
 #include <assert.h>
-#include <emmintrin.h>			// Intel aligned alloc and free
+#include "simd_compat.h"			// Intel aligned alloc and free
 
 #include "dump.h"
 #include "decoder.h"

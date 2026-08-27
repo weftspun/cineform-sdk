@@ -25,7 +25,7 @@
 #include <memory.h>
 #include <assert.h>
 #include "config.h"
-#include <emmintrin.h>				// Include support for SSE2 intrinsics
+#include "simd_compat.h"				// Include support for SSE2 intrinsics
 
 // The codec SDK and the codec library use the same memory allocator
 #include "../Common/CFHDAllocator.h"

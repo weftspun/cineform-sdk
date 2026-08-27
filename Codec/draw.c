@@ -35,7 +35,7 @@
 #include <memory.h>
 #include <assert.h>
 #include <limits.h>
-#include <emmintrin.h>
+#include "simd_compat.h"
 #include <math.h>
 #if __APPLE__
 #include <dlfcn.h>

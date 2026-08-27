@@ -35,7 +35,7 @@
 #include <memory.h>
 #include <limits.h>
 
-#include <emmintrin.h>		// SSE2 intrinsics
+#include "../Codec/simd_compat.h"		// SSE2 intrinsics
 
 //#include <string.h>
 //#include <assert.h>

@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
-#include <emmintrin.h>		// SSE2 intrinsics, _mm_malloc
+#include "../Codec/simd_compat.h"		// SSE2 intrinsics, _mm_malloc
 #ifdef __APPLE__
 #include <sys/time.h>
 #else

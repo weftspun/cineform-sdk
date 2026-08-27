@@ -34,7 +34,7 @@
 #include <assert.h>
 #include <memory.h>
 
-#include <emmintrin.h>
+#include "simd_compat.h"
 
 #include "dump.h"
 #include "encoder.h"

@@ -27,7 +27,7 @@
 
 #include <assert.h>
 #include <limits.h>
-#include <emmintrin.h>		// SSE2 intrinsics
+#include "simd_compat.h"		// SSE2 intrinsics
 #include <string.h>			// Memory routines
 
 #include "config.h"

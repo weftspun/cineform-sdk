@@ -33,7 +33,7 @@
 #include <assert.h>
 #include <math.h>
 #include <limits.h>
-#include <emmintrin.h>		// SSE2 intrinsics
+#include "simd_compat.h"		// SSE2 intrinsics
 
 #include "spatial.h"
 #include "filter.h"			// Declarations of filter routines

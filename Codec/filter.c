@@ -30,7 +30,7 @@
 
 #include <assert.h>
 #include <limits.h>
-#include <emmintrin.h>		// SSE2 intrinsics
+#include "simd_compat.h"		// SSE2 intrinsics
 
 #include "filter.h"			// Declarations of filter routines
 #include "image.h"			// Image processing data types

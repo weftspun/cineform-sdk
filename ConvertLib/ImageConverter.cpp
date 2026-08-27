@@ -40,7 +40,7 @@
 #endif
 
 #if XMMOPT
-#include <emmintrin.h>				// Include support for SSE2 intrinsics
+#include "../Codec/simd_compat.h"				// Include support for SSE2 intrinsics
 #endif
 
 #ifdef DEBUG
