@@ -25,7 +25,7 @@
 #include <memory.h>
 #include <assert.h>
 #include "config.h"
-#include <emmintrin.h>				// Include support for SSE2 intrinsics
+#include "simd_compat.h"				// Include support for SSE2 intrinsics
 
 // The codec SDK and the codec library use the same memory allocator
 #include "../Common/CFHDAllocator.h"
@@ -51,7 +51,7 @@
 #else
 
 // The GCC compiler requires declaration of the aligned memory allocation routines
-#include <mm_malloc.h>
+#include "simd_compat.h"
 
 #ifndef INLINE
 #define INLINE inline

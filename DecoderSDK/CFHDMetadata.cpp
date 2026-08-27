@@ -33,7 +33,7 @@
 #include <string.h>
 #include "CoreFoundation/CoreFoundation.h"
 #else
-#include  <mm_malloc.h>
+#include "../Codec/simd_compat.h"
 #endif
 #endif
 

@@ -22,7 +22,7 @@
 #ifndef SSE_TYPES_H
 #define SSE_TYPES_H
 
-#include "emmintrin.h"
+#include "../Codec/simd_compat.h"
 
 typedef union
 {

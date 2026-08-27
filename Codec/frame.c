@@ -24,7 +24,7 @@
 #include <string.h>
 #include <assert.h>
 #include <math.h>
-#include <emmintrin.h>		// SSE2 intrinsics
+#include "simd_compat.h"		// SSE2 intrinsics
 #include "config.h"
 #include "frame.h"
 #include "wavelet.h"

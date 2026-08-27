@@ -25,7 +25,7 @@
 #include "image.h"
 #include "config.h"
 
-#include <emmintrin.h>			// Intel aligned malloc and free
+#include "simd_compat.h"			// Intel aligned malloc and free
 
 #include <memory.h>				// Get definition of memset
 

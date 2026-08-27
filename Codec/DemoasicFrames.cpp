@@ -26,7 +26,7 @@
 #include <stdint.h>
 #include <math.h>
 #include <assert.h>
-#include <emmintrin.h>		// SSE2 intrinsics
+#include "simd_compat.h"		// SSE2 intrinsics
 
 #ifdef _WIN32
 #include <windows.h>
@@ -38,7 +38,7 @@
 #else
 #include <sys/stat.h>		// for _mkdir()
 #include <unistd.h>			// for usleep()
-#include <xmmintrin.h>
+#include "simd_compat.h"
 #endif
 
 #include "../Common/AVIExtendedHeader.h"

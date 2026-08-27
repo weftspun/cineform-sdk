@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
-#include <emmintrin.h>		// SSE2 intrinsics, _mm_malloc
+#include "../Codec/simd_compat.h"		// SSE2 intrinsics, _mm_malloc
 #ifdef __APPLE__
 #include <sys/time.h>
 #else
@@ -342,11 +342,24 @@ CFHD_Error DecodeFrame(void **frameDecBuffer,
 			&processflags,
 			sizeof(unsigned int));
 		if (error) return error;
+		// CFHD_TEST_MAXCPUS pins the decoder's thread count.
+		//
+		// Without it this is min(cores, 16), so the number differs between any two
+		// machines with different core counts -- and the output differs with it. That
+		// makes a cross-machine comparison of this test meaningless unless both sides
+		// are pinned, and it is the first thing to suspect when the same binary does
+		// not reproduce itself.
 #ifdef _DEBUG
 		unsigned int maxcpus = 1;
 #else
 		unsigned int maxcpus = 16;
 #endif
+		if (const char *pin = getenv("CFHD_TEST_MAXCPUS")) {
+			int v = atoi(pin);
+			if (v > 0) {
+				maxcpus = (unsigned int)v;
+			}
+		}
 		error = CFHD_SetActiveMetadata(decoderRef,
 			metadataDecRef,
 			TAG_CPU_MAX,

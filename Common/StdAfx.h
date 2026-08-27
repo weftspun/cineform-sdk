@@ -52,7 +52,7 @@
 #include <assert.h>
 
 #ifndef __APPLE__
-#include <mm_malloc.h>
+#include "../Codec/simd_compat.h"
 #endif
 
 #include <libgen.h>
