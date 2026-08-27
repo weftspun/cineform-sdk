@@ -18,7 +18,18 @@ project (CineFormSDK)
 # Set for every target rather than only ARM, so the flag is what fixes reproducibility
 # rather than the accident of which architecture lacks the instruction.
 if(NOT MSVC)
-  add_compile_options(-ffp-contract=off)
+  # -ffp-contract=off: clang fuses a*b+c into a single-rounding FMA where the hardware
+  # has one, so the same source gives different numbers on machines that differ in
+  # whether it does.
+  #
+  # -fno-strict-aliasing: this codec reads the same memory through int, short, char and
+  # vector types constantly -- WarpLib/sse_types.h is a union of five of them -- and the
+  # standard says a compiler may assume that never happens. gcc and clang exploit that
+  # assumption differently, which is measurable: with it on, gcc and clang builds of this
+  # tree, same OS and same ISA, disagree on all 400 frames of TestCFHD -d by up to 30 KB,
+  # while two ISAs under one compiler agree exactly. The difference is the compiler
+  # reading undefined behaviour, not the architecture.
+  add_compile_options(-ffp-contract=off -fno-strict-aliasing)
 endif()
 
 # GCC on aarch64 needs the SIMD features named explicitly. sse2neon reaches for CRC and
