@@ -34,7 +34,11 @@
 
 #else /* x86: unchanged */
 
-#include "simd_compat.h"
+/* NOT simd_compat.h. The bulk rewrite that replaced <emmintrin.h> across the tree
+   also rewrote this line, and the include guard made the self-include a silent
+   no-op -- so x86 got no intrinsics at all and every __m128i became undeclared.
+   Compiling on ARM cannot catch that; only building for x86 can. */
+#include <emmintrin.h>
 
 #endif
 
