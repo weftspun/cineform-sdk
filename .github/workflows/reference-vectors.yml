@@ -70,7 +70,11 @@ jobs:
       - uses: actions/download-artifact@v4
         with: { pattern: 'vectors-*', merge-multiple: true }
       - name: Compare x86_64 against arm64
+        # set -o pipefail, or `| tee` swallows the script's exit status and a failing
+        # comparison reports success. That happened on the first run of this workflow.
+        shell: bash
         run: |
+          set -o pipefail
           python3 scripts/compare_vectors.py \
             vectors-x86_64.txt vectors-arm64.txt x86_64 arm64 | tee compare.txt
       - name: Summary
