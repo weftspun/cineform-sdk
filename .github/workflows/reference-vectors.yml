@@ -38,6 +38,16 @@ jobs:
             label: linux-arm64
           # macOS arm64 stays as a third point, compared against linux-arm64 to show
           # what the platform contributes on its own.
+          # Same OS and ISA as linux-arm64, different compiler. linux-arm64 builds with
+          # the Ubuntu default (gcc) and macos-arm64 with clang, so the platform
+          # comparison was really OS *and* compiler at once -- the same conflation that
+          # made the first version of this workflow blame the ISA. This isolates the
+          # compiler.
+          - os: ubuntu-24.04-arm
+            arch: aarch64
+            label: linux-arm64-clang
+            cc: clang
+            cxx: clang++
           - os: macos-latest
             arch: arm64
             label: macos-arm64
@@ -59,7 +69,14 @@ jobs:
           test "$(uname -m)" = "${{ matrix.arch }}" || {
             echo "runner is $(uname -m), matrix says ${{ matrix.arch }}"; exit 1; }
 
+      - name: Install clang
+        if: matrix.cc == 'clang'
+        run: sudo apt-get update && sudo apt-get install -y clang
+
       - name: Build TestCFHD
+        env:
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
         run: |
           cmake -B build -DCMAKE_BUILD_TYPE=Release \
                 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DBUILD_TOOLS=ON
@@ -96,6 +113,14 @@ jobs:
           python3 scripts/compare_vectors.py \
             vectors-linux-x86_64.txt vectors-linux-arm64.txt linux-x86_64 linux-arm64 \
             | tee compare.txt
+      - name: Compiler — linux arm64 gcc vs linux arm64 clang (same OS and ISA, informational)
+        if: always()
+        shell: bash
+        continue-on-error: true
+        run: |
+          python3 scripts/compare_vectors.py \
+            vectors-linux-arm64.txt vectors-linux-arm64-clang.txt linux-gcc linux-clang \
+            | tee compiler.txt || true
       - name: Platform — linux arm64 vs macos arm64 (same ISA, informational)
         if: always()
         shell: bash
@@ -109,6 +134,8 @@ jobs:
         run: |
           { echo '## ISA: linux x86_64 vs linux arm64'; echo; echo '```';
             cat compare.txt; echo '```'; echo;
+            echo '## Compiler: gcc vs clang, both linux arm64'; echo; echo '```';
+            cat compiler.txt 2>/dev/null || echo '(not produced)'; echo '```'; echo;
             echo '## Platform: linux arm64 vs macos arm64 (same ISA)'; echo; echo '```';
             cat platform.txt 2>/dev/null || echo '(not produced)'; echo '```';
           } >> "$GITHUB_STEP_SUMMARY"
