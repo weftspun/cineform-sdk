@@ -3,6 +3,24 @@ cmake_minimum_required (VERSION 3.5.1)
 project (CineFormSDK)
 
 # Build settings
+# Float contraction, off, on every target.
+#
+# clang contracts a*b+c into a fused multiply-add where the hardware has one. That is a
+# single rounding instead of two, so the result is *more* accurate -- and different. ARM
+# has FMA and takes it; x86-64 without -mfma does not. The codec's scalar float paths
+# therefore produced different numbers on the two architectures, and a wavelet accumulates
+# the difference rather than dropping it.
+#
+# Measured with a differential harness against the same source built for both: the SSE
+# intrinsics agreed exactly, the scalar a*b+c did not, and -ffp-contract=off made all of
+# them agree. The MMX and SSE shims in Codec/simd_compat.h were not at fault.
+#
+# Set for every target rather than only ARM, so the flag is what fixes reproducibility
+# rather than the accident of which architecture lacks the instruction.
+if(NOT MSVC)
+  add_compile_options(-ffp-contract=off)
+endif()
+
 option(BUILD_LIBS "Build codec libraries" ON)
 option(BUILD_TOOLS "Build test tools" ON)
 option(BUILD_STATIC "Build static component" ON)
